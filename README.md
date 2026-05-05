@@ -1,14 +1,6 @@
 # TechCreateTest
 Test for Interview
 
-### Testing Assumptions :
-
-| # | Assumption                                                                                                   | Reason |
-|---|--------------------------------------------------------------------------------------------------------------|--------|
-| 1 | Valid and invalid test inputs were assumed based on the schema format and constraints                        | No test data specification was provided, so boundary and edge cases were derived from the schema rules |
-| 2 | Tests for `parseSchema` use the actual `schema.txt` for valid cases and temporary files for invalid cases    | Using the real schema ensures tests stay in sync. Temp files are needed for invalid cases since we can't put bad data in the real schema |
-| 3 | Generated FixedLengthParser.java and Record.java are validated by checking the generated source code content | The generated files are not compiled as part of the project, so we verify correctness by asserting against the generated string output |
-
 ### Logic Assumptions :
 
 | # | Assumption | Reason |
@@ -26,5 +18,24 @@ Test for Interview
 | 11 | Underscores/hyphens converted to camelCase (e.g., `first_name` → `firstName`) | Follows Java naming conventions |
 | 12 | Schema validation errors throw `SchemaParseException` with line number | Custom checked exception provides clear error handling instead of `return null` |
 
+### Testing Assumptions :
+
+| # | Assumption | Reason |
+|---|-----------|--------|
+| 1 | Valid and invalid test inputs were assumed based on the schema format and constraints | No test data specification was provided, so boundary and edge cases were derived from the schema rules |
+| 2 | Tests for `parseSchema` use the actual `schema.txt` for valid cases and temporary files for invalid cases | Using the real schema ensures tests stay in sync. Temp files are needed for invalid cases since we can't put bad data in the real schema |
+| 3 | Generated `FixedLengthParser.java` and `Record.java` are validated by checking the generated source code content | The generated files are not compiled as part of the project, so we verify correctness by asserting against the generated string output |
+
+### Test Strategy :
+
+| Test File | What it tests | How |
+|-----------|--------------|-----|
+| `SchemaFieldTest` | Single field validation (name, start, end) | Parameterized valid/invalid inputs against the `SchemaField` constructor. Covers: null/empty/blank names, invalid identifiers, negative/zero positions, start > end |
+| `MainTest` | Schema parsing and cross-field validation | Valid schemas: actual `schema.txt`, boundary cases (single char field, large positions, many fields, single-position overlap). Invalid schemas: temp files testing empty file, missing columns, non-integer positions, gaps, deep overlaps, duplicates (including after camelCase), out-of-order fields |
+| `MainTest` | `toCamelCase` conversion | Parameterized: single word, underscore-separated, hyphen-separated, uppercase input |
+| `MainTest` | Overlap constant adjustment | Verifies `ParserGenerator` adjusts the earlier field's end constant when a single-position overlap is detected |
+| `FixedLengthParserTest` | Generated `FixedLengthParser.java` structure | Verifies constants (count + names), method signatures, imports, field extraction with trim, short line handling. All dynamically derived from `schema.txt` |
+| `RecordTest` | Generated `Record.java` structure | Verifies fields (count + names), constructor (params + assignments), `toString` contains all fields. All dynamically derived from `schema.txt` |
+
 ### Known Limitations :
-The generated FixedLengthParser.java logic must match the provided sample solution and cannot be modified. As a result, there is no error handling inside the generated parser — no field validation, no data type checking, no logging of skipped lines, and no per-record error reporting. If requirements allowed modifying the parser logic, these would be addressed.
+The generated `FixedLengthParser.java` logic must match the provided sample solution and cannot be modified. As a result, there is no error handling inside the generated parser — no field validation, no data type checking, no logging of skipped lines, and no per-record error reporting. If requirements allowed modifying the parser logic, these would be addressed.

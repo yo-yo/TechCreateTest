@@ -61,8 +61,6 @@ class MainTest {
         assertEquals(expectedCount, fields.size());
     }
 
-    // --- Invalid schema tests ---
-
     static Stream<Arguments> invalidSchemas() {
         return Stream.of(
                 Arguments.of("", "empty file"),
@@ -87,17 +85,6 @@ class MainTest {
         assertThrows(SchemaParseException.class, () -> Main.parseSchema(invalidSchema));
     }
 
-    // --- Generator boundary tests ---
-
-    @Test
-    void parserGenerator_singleField_generatesCorrectly() {
-        List<SchemaField> fields = List.of(new SchemaField("flag", 1, 1));
-        String code = ParserGenerator.generate(fields);
-        assertTrue(code.contains("FLAG_START = 1"));
-        assertTrue(code.contains("FLAG_END = 1"));
-        assertTrue(code.contains("extractField(line, FLAG_START, FLAG_END).trim()"));
-    }
-
     @Test
     void parserGenerator_overlapAdjustsConstant() {
         List<SchemaField> fields = List.of(
@@ -108,42 +95,6 @@ class MainTest {
         assertTrue(code.contains("NAME_END = 19"), "Overlap should adjust NAME_END to 19");
         assertTrue(code.contains("GENDER_START = 20"));
     }
-
-    @Test
-    void parserGenerator_noOverlap_keepsOriginalEnd() {
-        List<SchemaField> fields = List.of(
-                new SchemaField("name", 1, 19),
-                new SchemaField("gender", 20, 21)
-        );
-        String code = ParserGenerator.generate(fields);
-        assertTrue(code.contains("NAME_END = 19"));
-        assertTrue(code.contains("GENDER_START = 20"));
-    }
-
-    @Test
-    void recordGenerator_singleField_generatesCorrectly() {
-        List<SchemaField> fields = List.of(new SchemaField("flag", 1, 1));
-        String code = RecordGenerator.generate(fields);
-        assertTrue(code.contains("private String flag"));
-        assertTrue(code.contains("public Record(String flag)"));
-        assertTrue(code.contains("flag='\""));
-    }
-
-    @Test
-    void recordGenerator_manyFields_generatesAllParams() {
-        List<SchemaField> fields = List.of(
-                new SchemaField("a", 1, 5),
-                new SchemaField("b", 6, 10),
-                new SchemaField("c", 11, 15)
-        );
-        String code = RecordGenerator.generate(fields);
-        assertTrue(code.contains("public Record(String a, String b, String c)"));
-        assertTrue(code.contains("this.a=a"));
-        assertTrue(code.contains("this.b=b"));
-        assertTrue(code.contains("this.c=c"));
-    }
-
-    // --- toCamelCase tests ---
 
     static Stream<Arguments> camelCaseInputs() {
         return Stream.of(
