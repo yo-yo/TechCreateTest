@@ -38,6 +38,14 @@ Test for Interview
 | `FixedLengthParserTest` | Generated `FixedLengthParser.java` structure | Verifies constants (count + names), method signatures, imports, field extraction with trim, short line handling. All dynamically derived from `schema.txt` |
 | `RecordTest` | Generated `Record.java` structure | Verifies fields (count + names), constructor (params + assignments), `toString` contains all fields. All dynamically derived from `schema.txt` |
 
+### Usage :
+
+```
+java -jar InteriewTest.jar [schema-file-path]
+```
+
+If no path is provided, defaults to `src/main/java/org/example/schema.txt`.
+
 ### Known Limitations :
 The generated `FixedLengthParser.java` logic must match the provided sample solution and cannot be modified. As a result, there is no error handling inside the generated parser — no field validation, no data type checking, no logging of skipped lines, and no per-record error reporting. If requirements allowed modifying the parser logic, these would be addressed.
 

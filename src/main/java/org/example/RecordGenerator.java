@@ -36,4 +36,5 @@ public class RecordGenerator {
 
         return sb.toString();
     }
+
 }
