@@ -38,9 +38,9 @@ class MainTest {
         List<SchemaField> fields = Main.parseSchema(schema);
         assertEquals(expectedCount, fields.size());
         for (SchemaField field : fields) {
-            assertNotNull(field.schemaVariable);
-            assertTrue(field.start >= 1);
-            assertTrue(field.end >= field.start);
+            assertNotNull(field.getSchemaVariable());
+            assertTrue(field.getStart() >= 1);
+            assertTrue(field.getEnd() >= field.getStart());
         }
     }
 

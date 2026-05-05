@@ -65,32 +65,32 @@ public class Main {
             throw new SchemaParseException("Schema file is empty, no fields to generate");
         }
 
-        if (schemaFieldsList.get(0).start != 1) {
-            throw new SchemaParseException("First field must start at position 1, got " + schemaFieldsList.get(0).start);
+        if (schemaFieldsList.get(0).getStart() != 1) {
+            throw new SchemaParseException("First field must start at position 1, got " + schemaFieldsList.get(0).getStart());
         }
 
         for (int i = 0; i < schemaFieldsList.size(); i++) {
             SchemaField current = schemaFieldsList.get(i);
 
             for (int j = i + 1; j < schemaFieldsList.size(); j++) {
-                if (current.schemaVariable.equals(schemaFieldsList.get(j).schemaVariable)) {
-                    throw new SchemaParseException("Duplicate field name: " + current.schemaVariable);
+                if (current.getSchemaVariable().equals(schemaFieldsList.get(j).getSchemaVariable())) {
+                    throw new SchemaParseException("Duplicate field name: " + current.getSchemaVariable());
                 }
             }
 
             if (i + 1 < schemaFieldsList.size()) {
                 SchemaField next = schemaFieldsList.get(i + 1);
 
-                if (next.start <= current.start) {
-                    throw new SchemaParseException("Fields not in sequential order: '" + current.schemaVariable + "' (start=" + current.start + ") and '" + next.schemaVariable + "' (start=" + next.start + ")");
+                if (next.getStart() <= current.getStart()) {
+                    throw new SchemaParseException("Fields not in sequential order: '" + current.getSchemaVariable() + "' (start=" + current.getStart() + ") and '" + next.getSchemaVariable() + "' (start=" + next.getStart() + ")");
                 }
 
-                if (next.start < current.end) {
-                    throw new SchemaParseException("Overlapping fields: '" + current.schemaVariable + "' (end=" + current.end + ") and '" + next.schemaVariable + "' (start=" + next.start + ")");
+                if (next.getStart() < current.getEnd()) {
+                    throw new SchemaParseException("Overlapping fields: '" + current.getSchemaVariable() + "' (end=" + current.getEnd() + ") and '" + next.getSchemaVariable() + "' (start=" + next.getStart() + ")");
                 }
 
-                if (next.start > current.end + 1) {
-                    throw new SchemaParseException("Gap between fields: '" + current.schemaVariable + "' (end=" + current.end + ") and '" + next.schemaVariable + "' (start=" + next.start + "), positions " + (current.end + 1) + "-" + (next.start - 1) + " unused");
+                if (next.getStart() > current.getEnd() + 1) {
+                    throw new SchemaParseException("Gap between fields: '" + current.getSchemaVariable() + "' (end=" + current.getEnd() + ") and '" + next.getSchemaVariable() + "' (start=" + next.getStart() + "), positions " + (current.getEnd() + 1) + "-" + (next.getStart() - 1) + " unused");
                 }
             }
         }

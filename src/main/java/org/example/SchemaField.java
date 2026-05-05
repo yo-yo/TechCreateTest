@@ -2,11 +2,11 @@ package org.example;
 
 public class SchemaField {
 
-    public String schemaVariable;
+    private String schemaVariable;
 
-    public int start;
+    private int start;
 
-    public int end;
+    private int end;
 
     public SchemaField(String schemaVariable, int start, int end) {
         if (schemaVariable == null || schemaVariable.trim().isEmpty() || schemaVariable.equals("null")) {
@@ -24,6 +24,18 @@ public class SchemaField {
         this.schemaVariable = schemaVariable;
         this.start = start;
         this.end = end;
+    }
+
+    public String getSchemaVariable() {
+        return schemaVariable;
+    }
+
+    public int getStart() {
+        return start;
+    }
+
+    public int getEnd() {
+        return end;
     }
 
     @Override

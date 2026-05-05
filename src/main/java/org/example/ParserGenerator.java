@@ -17,18 +17,18 @@ public class ParserGenerator {
 
         for (int i = 0; i < schemaFieldsList.size(); i++) {
             SchemaField field = schemaFieldsList.get(i);
-            String upper = field.schemaVariable.toUpperCase();
-            int end = field.end;
-            if (i + 1 < schemaFieldsList.size() && field.end >= schemaFieldsList.get(i + 1).start) {
-                end = schemaFieldsList.get(i + 1).start - 1;
+            String upper = field.getSchemaVariable().toUpperCase();
+            int end = field.getEnd();
+            if (i + 1 < schemaFieldsList.size() && field.getEnd() >= schemaFieldsList.get(i + 1).getStart()) {
+                end = schemaFieldsList.get(i + 1).getStart() - 1;
             }
-            fp.append("    private static final int " + upper + "_START = " + field.start + ";\n");
+            fp.append("    private static final int " + upper + "_START = " + field.getStart() + ";\n");
             fp.append("    private static final int " + upper + "_END = " + end + ";\n");
         }
         fp.append("\n");
 
         SchemaField lastField = schemaFieldsList.get(schemaFieldsList.size() - 1);
-        String lastEndConstant = lastField.schemaVariable.toUpperCase() + "_END";
+        String lastEndConstant = lastField.getSchemaVariable().toUpperCase() + "_END";
 
         fp.append("    public List<Record> parseFile(String filePath) throws IOException {\n");
         fp.append("        List<Record> records = new ArrayList<>();\n");
@@ -43,14 +43,14 @@ public class ParserGenerator {
         fp.append("                // Extract fields based on fixed positions\n");
 
         for (SchemaField field : schemaFieldsList) {
-            String upper = field.schemaVariable.toUpperCase();
-            fp.append("                String " + field.schemaVariable + " = extractField(line, " + upper + "_START, " + upper + "_END).trim();\n");
+            String upper = field.getSchemaVariable().toUpperCase();
+            fp.append("                String " + field.getSchemaVariable() + " = extractField(line, " + upper + "_START, " + upper + "_END).trim();\n");
         }
         fp.append("                \n");
         fp.append("                // Create a new Record object\n");
 
         StringJoiner recordParams = new StringJoiner(", ");
-        schemaFieldsList.forEach(x -> recordParams.add(x.schemaVariable));
+        schemaFieldsList.forEach(x -> recordParams.add(x.getSchemaVariable()));
         fp.append("                Record record = new Record(" + recordParams + ");\n");
         fp.append("                records.add(record);\n");
         fp.append("            }\n");

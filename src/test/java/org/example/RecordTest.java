@@ -34,28 +34,28 @@ class RecordTest {
         assertEquals(fields.size(), fieldCount);
 
         for (SchemaField f : fields) {
-            assertTrue(recordCode.contains("private String " + f.schemaVariable),
-                    "Missing field: " + f.schemaVariable);
+            assertTrue(recordCode.contains("private String " + f.getSchemaVariable()),
+                    "Missing field: " + f.getSchemaVariable());
         }
     }
 
     @Test
     void recordHasCorrectConstructor() {
         StringJoiner params = new StringJoiner(", ");
-        fields.forEach(f -> params.add("String " + f.schemaVariable));
+        fields.forEach(f -> params.add("String " + f.getSchemaVariable()));
         assertTrue(recordCode.contains("public Record(" + params + ")"));
 
         for (SchemaField f : fields) {
-            assertTrue(recordCode.contains("this." + f.schemaVariable + "=" + f.schemaVariable),
-                    "Missing assignment for: " + f.schemaVariable);
+            assertTrue(recordCode.contains("this." + f.getSchemaVariable() + "=" + f.getSchemaVariable()),
+                    "Missing assignment for: " + f.getSchemaVariable());
         }
     }
 
     @Test
     void recordToStringContainsAllFields() {
         for (SchemaField f : fields) {
-            assertTrue(recordCode.contains(f.schemaVariable + "='\""),
-                    "toString missing field: " + f.schemaVariable);
+            assertTrue(recordCode.contains(f.getSchemaVariable() + "='\""),
+                    "toString missing field: " + f.getSchemaVariable());
         }
     }
 }

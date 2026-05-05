@@ -43,8 +43,8 @@ class FixedLengthParserTest {
         assertEquals(fields.size() * 2, constantCount);
 
         for (SchemaField f : fields) {
-            String upper = f.schemaVariable.toUpperCase();
-            assertTrue(parserCode.contains(upper + "_START = " + f.start),
+            String upper = f.getSchemaVariable().toUpperCase();
+            assertTrue(parserCode.contains(upper + "_START = " + f.getStart()),
                     "Missing constant: " + upper + "_START");
             assertTrue(parserCode.contains(upper + "_END ="),
                     "Missing constant: " + upper + "_END");
@@ -66,14 +66,14 @@ class FixedLengthParserTest {
     @Test
     void parserCreatesRecordWithAllFields() {
         StringJoiner params = new StringJoiner(", ");
-        fields.forEach(f -> params.add(f.schemaVariable));
+        fields.forEach(f -> params.add(f.getSchemaVariable()));
         assertTrue(parserCode.contains("new Record(" + params + ")"));
     }
 
     @Test
     void parserSkipsShortLines() {
         SchemaField lastField = fields.get(fields.size() - 1);
-        String lastEndConstant = lastField.schemaVariable.toUpperCase() + "_END";
+        String lastEndConstant = lastField.getSchemaVariable().toUpperCase() + "_END";
         assertTrue(parserCode.contains("line.length() < " + lastEndConstant),
                 "Parser should check line length against last field end constant");
     }
@@ -81,9 +81,9 @@ class FixedLengthParserTest {
     @Test
     void parserExtractsAllFieldsWithTrim() {
         for (SchemaField f : fields) {
-            String upper = f.schemaVariable.toUpperCase();
+            String upper = f.getSchemaVariable().toUpperCase();
             assertTrue(parserCode.contains("extractField(line, " + upper + "_START, " + upper + "_END).trim()"),
-                    f.schemaVariable + " should use extractField with trim");
+                    f.getSchemaVariable() + " should use extractField with trim");
         }
     }
 

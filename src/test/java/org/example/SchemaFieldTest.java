@@ -24,9 +24,9 @@ class SchemaFieldTest {
     @MethodSource("validInputs")
     void validInputs_setsAllFieldsCorrectly(String name, int start, int end) {
         SchemaField field = new SchemaField(name, start, end);
-        assertEquals(name, field.schemaVariable);
-        assertEquals(start, field.start);
-        assertEquals(end, field.end);
+        assertEquals(name, field.getSchemaVariable());
+        assertEquals(start, field.getStart());
+        assertEquals(end, field.getEnd());
     }
 
     static Stream<Arguments> invalidInputs() {

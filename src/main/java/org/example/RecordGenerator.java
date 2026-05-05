@@ -9,17 +9,17 @@ public class RecordGenerator {
         StringBuilder sb = new StringBuilder();
         sb.append("public class Record {\n");
         for (SchemaField x : schemaFieldsList) {
-            sb.append("     private String " + x.schemaVariable + ";\n");
+            sb.append("     private String " + x.getSchemaVariable() + ";\n");
         }
         sb.append("\n");
         sb.append("     public Record(");
 
         StringJoiner params = new StringJoiner(", ");
-        schemaFieldsList.forEach(x -> params.add("String " + x.schemaVariable));
+        schemaFieldsList.forEach(x -> params.add("String " + x.getSchemaVariable()));
         sb.append(params + "){\n");
 
         for (SchemaField x : schemaFieldsList) {
-            sb.append("         this." + x.schemaVariable + "=" + x.schemaVariable + ";\n");
+            sb.append("         this." + x.getSchemaVariable() + "=" + x.getSchemaVariable() + ";\n");
         }
 
         sb.append("     }\n\n");
@@ -28,7 +28,7 @@ public class RecordGenerator {
         sb.append("         return \"Record{");
 
         StringJoiner toStringFields = new StringJoiner(" + \"', ");
-        schemaFieldsList.forEach(x -> toStringFields.add(x.schemaVariable + "='\" + " + x.schemaVariable));
+        schemaFieldsList.forEach(x -> toStringFields.add(x.getSchemaVariable() + "='\" + " + x.getSchemaVariable()));
         sb.append(toStringFields + " + \"'}\";\n");
 
         sb.append("     }\n");
