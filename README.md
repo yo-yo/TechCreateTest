@@ -12,11 +12,10 @@ Test for Interview
 | 5 | First field must start at position 1 | Otherwise data at the beginning of the line is silently ignored, likely a schema error |
 | 6 | Fields must be in sequential positional order | Out-of-order fields would produce incorrect constants in the generated code |
 | 7 | No gaps allowed between fields | Gaps mean data at those positions is never extracted, likely a schema error |
-| 8 | Duplicate field names (after camelCase conversion) not allowed | Would produce duplicate Java variables, causing compilation errors |
+| 8 | Duplicate field names not allowed (exact match, case-sensitive) | Would produce duplicate Java variables, causing compilation errors. Case-sensitive comparison is used because Java identifiers are case-sensitive (`firstName` and `FirstName` are valid distinct fields) |
 | 9 | Schema must have at least 3 columns per line (`name start end`), positive integers, `start <= end` | Minimum information needed to define a fixed-length field |
-| 10 | Field names must be valid Java identifiers | Used directly as variable names in generated code |
-| 11 | Underscores/hyphens converted to camelCase (e.g., `first_name` → `firstName`) | Follows Java naming conventions |
-| 12 | Schema validation errors throw `SchemaParseException` with line number | Custom checked exception provides clear error handling instead of `return null` |
+| 10 | Field names must be valid Java identifiers (no leading underscores/hyphens) | Used directly as variable names in generated code |
+| 11 | Schema validation errors throw `SchemaParseException` with line number | Custom checked exception provides clear error handling instead of `return null` |
 
 ### Testing Assumptions :
 
@@ -32,8 +31,7 @@ Test for Interview
 | Test File | What it tests | How |
 |-----------|--------------|-----|
 | `SchemaFieldTest` | Single field validation (name, start, end) | Parameterized valid/invalid inputs against the `SchemaField` constructor. Covers: null/empty/blank names, invalid identifiers, negative/zero positions, start > end |
-| `MainTest` | Schema parsing and cross-field validation | Valid schemas: actual `schema.txt`, boundary cases (single char field, large positions, many fields, single-position overlap). Invalid schemas: temp files testing empty file, missing columns, non-integer positions, gaps, deep overlaps, duplicates (including after camelCase), out-of-order fields |
-| `MainTest` | `toCamelCase` conversion | Parameterized: single word, underscore-separated, hyphen-separated, uppercase input |
+| `MainTest` | Schema parsing and cross-field validation | Valid schemas: actual `schema.txt`, boundary cases (single char field, large positions, many fields, single-position overlap). Invalid schemas: temp files testing empty file, missing columns, non-integer positions, gaps, deep overlaps, duplicates, leading underscore/hyphen, out-of-order fields |
 | `MainTest` | Overlap constant adjustment | Verifies `ParserGenerator` adjusts the earlier field's end constant when a single-position overlap is detected |
 | `FixedLengthParserTest` | Generated `FixedLengthParser.java` structure | Verifies constants (count + names), method signatures, imports, field extraction with trim, short line handling. All dynamically derived from `schema.txt` |
 | `RecordTest` | Generated `Record.java` structure | Verifies fields (count + names), constructor (params + assignments), `toString` contains all fields. All dynamically derived from `schema.txt` |

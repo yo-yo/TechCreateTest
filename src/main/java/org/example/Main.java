@@ -50,7 +50,7 @@ public class Main {
                 }
 
                 try {
-                    String fieldName = toCamelCase(lineContents[0]);
+                    String fieldName = lineContents[0];
                     int start = Integer.parseInt(lineContents[1]);
                     int end = Integer.parseInt(lineContents[2]);
                     schemaFieldsList.add(new SchemaField(fieldName, start, end));
@@ -106,13 +106,4 @@ public class Main {
         }
     }
 
-    static String toCamelCase(String input) {
-        String[] parts = input.split("[_\\-\\s]+");
-        StringBuilder result = new StringBuilder(parts[0].toLowerCase());
-        for (int i = 1; i < parts.length; i++) {
-            result.append(parts[i].substring(0, 1).toUpperCase());
-            result.append(parts[i].substring(1).toLowerCase());
-        }
-        return result.toString();
-    }
 }

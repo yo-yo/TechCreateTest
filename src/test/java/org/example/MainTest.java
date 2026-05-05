@@ -72,9 +72,10 @@ class MainTest {
                 Arguments.of("name 1 20\ngender 15 21\n", "overlapping fields"),
                 Arguments.of("name 1 18\ngender 20 21\n", "gap between fields"),
                 Arguments.of("123invalid 1 20\n", "invalid field name"),
-                Arguments.of("first_name 1 10\nfirst-name 11 20\n", "duplicate after camelCase conversion"),
                 Arguments.of("name 1 0\n", "end less than start"),
-                Arguments.of("name 0 10\n", "zero start position")
+                Arguments.of("name 0 10\n", "zero start position"),
+                Arguments.of("_FIRST_NAME 1 20\n", "leading underscore in field name"),
+                Arguments.of("-name 1 20\n", "leading hyphen in field name")
         );
     }
 
@@ -96,18 +97,4 @@ class MainTest {
         assertTrue(code.contains("GENDER_START = 20"));
     }
 
-    static Stream<Arguments> camelCaseInputs() {
-        return Stream.of(
-                Arguments.of("name", "name"),
-                Arguments.of("first_name", "firstName"),
-                Arguments.of("first-name", "firstName"),
-                Arguments.of("FIRST_NAME", "firstName")
-        );
-    }
-
-    @ParameterizedTest(name = "\"{0}\" -> \"{1}\"")
-    @MethodSource("camelCaseInputs")
-    void toCamelCase_convertsCorrectly(String input, String expected) {
-        assertEquals(expected, Main.toCamelCase(input));
-    }
 }

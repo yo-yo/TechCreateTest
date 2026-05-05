@@ -15,7 +15,6 @@ class SchemaFieldTest {
                 Arguments.of("name", 1, 20, "simple name"),
                 Arguments.of("flag", 5, 5, "single position"),
                 Arguments.of("first_name", 1, 20, "underscore name"),
-                Arguments.of("_name", 1, 20, "leading underscore"),
                 Arguments.of("field1", 1, 10, "alphanumeric name")
         );
     }
@@ -41,7 +40,8 @@ class SchemaFieldTest {
                 Arguments.of("null", 1, 20, "string null as name"),
                 Arguments.of("first name", 1, 20, "name with spaces"),
                 Arguments.of("first-name", 1, 20, "name with hyphens"),
-                Arguments.of("name", -1, -5, "both start and end negative")
+                Arguments.of("name", -1, -5, "both start and end negative"),
+                Arguments.of("_name", 1, 20, "leading underscore")
         );
     }
 
