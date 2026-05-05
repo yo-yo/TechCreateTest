@@ -25,6 +25,7 @@ Test for Interview
 | 1 | Valid and invalid test inputs were assumed based on the schema format and constraints | No test data specification was provided, so boundary and edge cases were derived from the schema rules |
 | 2 | Tests for `parseSchema` use the actual `schema.txt` for valid cases and temporary files for invalid cases | Using the real schema ensures tests stay in sync. Temp files are needed for invalid cases since we can't put bad data in the real schema |
 | 3 | Generated `FixedLengthParser.java` and `Record.java` are validated by checking the generated source code content | The generated files are not compiled as part of the project, so we verify correctness by asserting against the generated string output |
+| 4 | `@MethodSource` with `Stream<Arguments>` is used instead of `@CsvSource` for parameterized tests | Test inputs contain multi-line strings (`\n`) and spaces that CSV cannot represent cleanly without awkward escaping |
 
 ### Test Strategy :
 
