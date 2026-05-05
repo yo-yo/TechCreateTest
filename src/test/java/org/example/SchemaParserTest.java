@@ -11,7 +11,7 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class MainTest {
+class SchemaParserTest {
 
     private static List<String> toLines(String content) {
         return Arrays.asList(content.split("\n"));
@@ -29,7 +29,7 @@ class MainTest {
     @ParameterizedTest(name = "accepts {2}")
     @MethodSource("validSchemas")
     void parseSchema_validSchema_parsesCorrectly(String content, int expectedCount, String reason) throws SchemaParseException {
-        List<SchemaField> fields = Main.parseSchema(toLines(content));
+        List<SchemaField> fields = SchemaParser.parse(toLines(content));
         assertEquals(expectedCount, fields.size());
     }
 
@@ -54,7 +54,7 @@ class MainTest {
     @ParameterizedTest(name = "rejects {1}")
     @MethodSource("invalidSchemas")
     void parseSchema_invalidSchema_throws(String content, String reason) {
-        assertThrows(SchemaParseException.class, () -> Main.parseSchema(toLines(content)));
+        assertThrows(SchemaParseException.class, () -> SchemaParser.parse(toLines(content)));
     }
 
     @Test
