@@ -12,17 +12,17 @@ class SchemaFieldTest {
 
     static Stream<Arguments> validInputs() {
         return Stream.of(
-                Arguments.of("name", 1, 20),
-                Arguments.of("flag", 5, 5),
-                Arguments.of("first_name", 1, 20),
-                Arguments.of("_name", 1, 20),
-                Arguments.of("field1", 1, 10)
+                Arguments.of("name", 1, 20, "simple name"),
+                Arguments.of("flag", 5, 5, "single position"),
+                Arguments.of("first_name", 1, 20, "underscore name"),
+                Arguments.of("_name", 1, 20, "leading underscore"),
+                Arguments.of("field1", 1, 10, "alphanumeric name")
         );
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "accepts {3}")
     @MethodSource("validInputs")
-    void validInputs_setsAllFieldsCorrectly(String name, int start, int end) {
+    void validInputs_setsAllFieldsCorrectly(String name, int start, int end, String reason) {
         SchemaField field = new SchemaField(name, start, end);
         assertEquals(name, field.getSchemaVariable());
         assertEquals(start, field.getStart());
