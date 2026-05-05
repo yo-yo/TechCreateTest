@@ -3,9 +3,6 @@ package org.example;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.StringJoiner;
 
@@ -17,13 +14,13 @@ class RecordTest {
     private static List<SchemaField> fields;
 
     @BeforeAll
-    static void generateFiles() throws IOException {
-        Main.main(new String[]{});
-        recordCode = Files.readString(Path.of("src/main/java/org/example/Record.java"));
-        fields = Files.readAllLines(Path.of("src/main/java/org/example/schema.txt")).stream()
-                .map(line -> line.split("\\s+"))
-                .map(parts -> new SchemaField(parts[0], Integer.parseInt(parts[1]), Integer.parseInt(parts[2])))
-                .toList();
+    static void setup() {
+        fields = List.of(
+                new SchemaField("name", 1, 20),
+                new SchemaField("gender", 21, 22),
+                new SchemaField("age", 23, 25)
+        );
+        recordCode = RecordGenerator.generate(fields);
     }
 
     @Test

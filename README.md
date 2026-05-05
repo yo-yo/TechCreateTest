@@ -33,8 +33,8 @@ Test for Interview
 | `SchemaFieldTest` | Single field validation (name, start, end) | Parameterized valid/invalid inputs against the `SchemaField` constructor. Covers: null/empty/blank names, invalid identifiers, negative/zero positions, start > end |
 | `MainTest` | Schema parsing and cross-field validation | Valid schemas: actual `schema.txt`, boundary cases (single char field, large positions, many fields, single-position overlap). Invalid schemas: temp files testing empty file, missing columns, non-integer positions, gaps, deep overlaps, duplicates, leading underscore/hyphen, out-of-order fields |
 | `MainTest` | Overlap constant adjustment | Verifies `ParserGenerator` adjusts the earlier field's end constant when a single-position overlap is detected |
-| `FixedLengthParserTest` | Generated `FixedLengthParser.java` structure | Verifies constants (count + names), method signatures, imports, field extraction with trim, short line handling. All dynamically derived from `schema.txt` |
-| `RecordTest` | Generated `Record.java` structure | Verifies fields (count + names), constructor (params + assignments), `toString` contains all fields. All dynamically derived from `schema.txt` |
+| `FixedLengthParserTest` | Generated `FixedLengthParser.java` structure | Verifies constants (count + names), method signatures, imports, field extraction with trim, short line handling. Uses in-memory generation, no file I/O |
+| `RecordTest` | Generated `Record.java` structure | Verifies fields (count + names), constructor (params + assignments), `toString` contains all fields. Uses in-memory generation, no file I/O |
 
 ### Usage :
 

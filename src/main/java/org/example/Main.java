@@ -1,9 +1,8 @@
 package org.example;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.Logger;
@@ -34,31 +33,33 @@ public class Main {
     }
 
     static List<SchemaField> parseSchema(File schemaFile) throws IOException, SchemaParseException {
+        List<String> lines = Files.readAllLines(schemaFile.toPath());
+        return parseSchema(lines);
+    }
+
+    static List<SchemaField> parseSchema(List<String> lines) throws SchemaParseException {
         List<SchemaField> schemaFieldsList = new ArrayList<>();
-        try (BufferedReader reader = new BufferedReader(new FileReader(schemaFile))) {
-            String line;
-            int lineNumber = 0;
-            while ((line = reader.readLine()) != null) {
-                lineNumber++;
-                line = line.trim();
-                if (line.isEmpty())
-                    continue;
+        int lineNumber = 0;
+        for (String rawLine : lines) {
+            lineNumber++;
+            String line = rawLine.trim();
+            if (line.isEmpty())
+                continue;
 
-                String[] lineContents = line.split("\\s+");
-                if (lineContents.length < 3) {
-                    throw new SchemaParseException("Line " + lineNumber + ": expected 3 columns (name start end), got " + lineContents.length);
-                }
+            String[] lineContents = line.split("\\s+");
+            if (lineContents.length < 3) {
+                throw new SchemaParseException("Line " + lineNumber + ": expected 3 columns (name start end), got " + lineContents.length);
+            }
 
-                try {
-                    String fieldName = lineContents[0];
-                    int start = Integer.parseInt(lineContents[1]);
-                    int end = Integer.parseInt(lineContents[2]);
-                    schemaFieldsList.add(new SchemaField(fieldName, start, end));
-                } catch (NumberFormatException e) {
-                    throw new SchemaParseException("Line " + lineNumber + ": start/end must be integers");
-                } catch (IllegalArgumentException e) {
-                    throw new SchemaParseException("Line " + lineNumber + ": " + e.getMessage());
-                }
+            try {
+                String fieldName = lineContents[0];
+                int start = Integer.parseInt(lineContents[1]);
+                int end = Integer.parseInt(lineContents[2]);
+                schemaFieldsList.add(new SchemaField(fieldName, start, end));
+            } catch (NumberFormatException e) {
+                throw new SchemaParseException("Line " + lineNumber + ": start/end must be integers");
+            } catch (IllegalArgumentException e) {
+                throw new SchemaParseException("Line " + lineNumber + ": " + e.getMessage());
             }
         }
 
