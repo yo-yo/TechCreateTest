@@ -6,7 +6,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.StringJoiner;
 import java.util.logging.Logger;
 
 public class Main {
@@ -22,122 +21,99 @@ public class Main {
             return;
         }
 
+        try {
+            List<SchemaField> schemaFieldsList = parseSchema(schemaFile);
+            writeFile(outputDir + "Record.java", RecordGenerator.generate(schemaFieldsList), "Record.java");
+            writeFile(outputDir + "FixedLengthParser.java", ParserGenerator.generate(schemaFieldsList), "FixedLengthParser.java");
+        } catch (SchemaParseException e) {
+            logger.severe("Schema validation failed: " + e.getMessage());
+        } catch (IOException e) {
+            logger.severe("Error reading schema file: " + e.getMessage());
+        }
+    }
+
+    static List<SchemaField> parseSchema(File schemaFile) throws IOException, SchemaParseException {
         List<SchemaField> schemaFieldsList = new ArrayList<>();
         try (BufferedReader reader = new BufferedReader(new FileReader(schemaFile))) {
             String line;
+            int lineNumber = 0;
             while ((line = reader.readLine()) != null) {
+                lineNumber++;
+                line = line.trim();
+                if (line.isEmpty())
+                    continue;
+
                 String[] lineContents = line.split("\\s+");
+                if (lineContents.length < 3) {
+                    throw new SchemaParseException("Line " + lineNumber + ": expected 3 columns (name start end), got " + lineContents.length);
+                }
 
-                String fieldName = lineContents[0];
-                int start = Integer.parseInt(lineContents[1]);
-                int end = Integer.parseInt(lineContents[2]);
-                schemaFieldsList.add(new SchemaField(fieldName, start, end));
+                try {
+                    String fieldName = toCamelCase(lineContents[0]);
+                    int start = Integer.parseInt(lineContents[1]);
+                    int end = Integer.parseInt(lineContents[2]);
+                    schemaFieldsList.add(new SchemaField(fieldName, start, end));
+                } catch (NumberFormatException e) {
+                    throw new SchemaParseException("Line " + lineNumber + ": start/end must be integers");
+                } catch (IllegalArgumentException e) {
+                    throw new SchemaParseException("Line " + lineNumber + ": " + e.getMessage());
+                }
             }
+        }
+
+        if (schemaFieldsList.isEmpty()) {
+            throw new SchemaParseException("Schema file is empty, no fields to generate");
+        }
+
+        if (schemaFieldsList.get(0).start != 1) {
+            throw new SchemaParseException("First field must start at position 1, got " + schemaFieldsList.get(0).start);
+        }
+
+        for (int i = 0; i < schemaFieldsList.size(); i++) {
+            SchemaField current = schemaFieldsList.get(i);
+
+            for (int j = i + 1; j < schemaFieldsList.size(); j++) {
+                if (current.schemaVariable.equals(schemaFieldsList.get(j).schemaVariable)) {
+                    throw new SchemaParseException("Duplicate field name: " + current.schemaVariable);
+                }
+            }
+
+            if (i + 1 < schemaFieldsList.size()) {
+                SchemaField next = schemaFieldsList.get(i + 1);
+
+                if (next.start <= current.start) {
+                    throw new SchemaParseException("Fields not in sequential order: '" + current.schemaVariable + "' (start=" + current.start + ") and '" + next.schemaVariable + "' (start=" + next.start + ")");
+                }
+
+                if (next.start < current.end) {
+                    throw new SchemaParseException("Overlapping fields: '" + current.schemaVariable + "' (end=" + current.end + ") and '" + next.schemaVariable + "' (start=" + next.start + ")");
+                }
+
+                if (next.start > current.end + 1) {
+                    throw new SchemaParseException("Gap between fields: '" + current.schemaVariable + "' (end=" + current.end + ") and '" + next.schemaVariable + "' (start=" + next.start + "), positions " + (current.end + 1) + "-" + (next.start - 1) + " unused");
+                }
+            }
+        }
+
+        return schemaFieldsList;
+    }
+
+    private static void writeFile(String path, String content, String fileName) {
+        try (FileWriter writer = new FileWriter(path)) {
+            writer.write(content);
+            logger.info(fileName + " generated.");
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            logger.severe("Error writing " + fileName + ": " + e.getMessage());
         }
+    }
 
-        StringBuilder sb = new StringBuilder();
-        sb.append("public class Record {\n");
-        for(SchemaField x: schemaFieldsList){
-            sb.append("     private String " + x.schemaVariable + ";\n");
+    static String toCamelCase(String input) {
+        String[] parts = input.split("[_\\-\\s]+");
+        StringBuilder result = new StringBuilder(parts[0].toLowerCase());
+        for (int i = 1; i < parts.length; i++) {
+            result.append(parts[i].substring(0, 1).toUpperCase());
+            result.append(parts[i].substring(1).toLowerCase());
         }
-        sb.append("\n");
-        sb.append("     public Record(");
-
-        StringJoiner params = new StringJoiner(", ");
-        schemaFieldsList.forEach(x -> params.add("String " + x.schemaVariable));
-        sb.append(params + "){\n");
-
-        for(SchemaField x: schemaFieldsList){
-            sb.append("         this." + x.schemaVariable + "=" + x.schemaVariable + ";\n");
-        }
-
-        sb.append("     }\n\n");
-        sb.append("     @Override\n");
-        sb.append("     public String toString() {\n");
-        sb.append("         return \"Record{");
-
-        StringJoiner toStringFields = new StringJoiner(" + \"', ");
-        schemaFieldsList.forEach(x -> toStringFields.add(x.schemaVariable + "='\" + " + x.schemaVariable));
-        sb.append(toStringFields + " + \"'}\";\n");
-
-        sb.append("     }\n");
-        sb.append("     // Getters and Setters (if needed)\n\n}");
-
-        try (FileWriter writer = new FileWriter(outputDir + "Record.java")) {
-            writer.write(sb.toString());
-            logger.info("Record.java generated.");
-        } catch (IOException e) {
-            logger.severe("Error writing file: " + e.getMessage());
-        }
-
-        StringBuilder fp = new StringBuilder();
-        fp.append("import java.io.BufferedReader;\n");
-        fp.append("import java.io.FileReader;\n");
-        fp.append("import java.io.IOException;\n");
-        fp.append("import java.util.ArrayList;\n");
-        fp.append("import java.util.List;\n\n");
-        fp.append("public class FixedLengthParser {\n\n");
-        fp.append("     // Schema configuration\n");
-
-        for (SchemaField x : schemaFieldsList) {
-            fp.append("     private static final int " + x.schemaVariable.toUpperCase() + "_START = " + x.start + ";\n");
-            fp.append("     private static final int " + x.schemaVariable.toUpperCase() + "_END = " + x.end + ";\n");
-        }
-        fp.append("\n");
-
-        SchemaField lastField = schemaFieldsList.get(schemaFieldsList.size() - 1);
-        String lastEndConstant = lastField.schemaVariable.toUpperCase() + "_END";
-
-        fp.append("     public List<Record> parseFile(String filePath) throws IOException {\n");
-        fp.append("         List<Record> records = new ArrayList<>();\n");
-        fp.append("         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {\n");
-        fp.append("             String line;\n");
-        fp.append("             while ((line = reader.readLine()) != null) {\n");
-        fp.append("                 if (line.length() < " + lastEndConstant + ") {\n");
-        fp.append("                     // Handle lines that are shorter than expected\n");
-        fp.append("                     continue;\n");
-        fp.append("                 }\n\n");
-        fp.append("                 // Extract fields based on fixed positions\n");
-
-        for (SchemaField x : schemaFieldsList) {
-            String upper = x.schemaVariable.toUpperCase();
-            fp.append("                 String " + x.schemaVariable + " = extractField(line, " + upper + "_START, " + upper + "_END).trim();\n");
-        }
-        fp.append("\n");
-        fp.append("                 // Create a new Record object\n");
-
-        StringJoiner recordParams = new StringJoiner(", ");
-        schemaFieldsList.forEach(x -> recordParams.add(x.schemaVariable));
-
-        fp.append("                 Record record = new Record(" + recordParams + ");\n");
-        fp.append("                 records.add(record);\n");
-        fp.append("             }\n");
-        fp.append("         }\n");
-        fp.append("         return records;\n");
-        fp.append("     }\n\n");
-        fp.append("     private String extractField(String line, int start, int end) {\n");
-        fp.append("         return line.substring(start - 1, end);\n");
-        fp.append("     }\n\n");
-        fp.append("     public static void main(String[] args) {\n");
-        fp.append("         FixedLengthParser parser = new FixedLengthParser();\n");
-        fp.append("         try {\n");
-        fp.append("             List<Record> records = parser.parseFile(\"path/to/your/file.txt\");\n");
-        fp.append("             for (Record record : records) {\n");
-        fp.append("                 System.out.println(record);\n");
-        fp.append("             }\n");
-        fp.append("         } catch (IOException e) {\n");
-        fp.append("             e.printStackTrace();\n");
-        fp.append("         }\n");
-        fp.append("     }\n");
-        fp.append("}\n");
-
-        try (FileWriter writer = new FileWriter(outputDir + "FixedLengthParser.java")) {
-            writer.write(fp.toString());
-            logger.info("FixedLengthParser.java generated.");
-        } catch (IOException e) {
-            logger.severe("Error writing file: " + e.getMessage());
-        }
+        return result.toString();
     }
 }
