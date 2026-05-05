@@ -22,7 +22,7 @@ Test for Interview
 | # | Assumption | Reason |
 |---|-----------|--------|
 | 1 | Valid and invalid test inputs were assumed based on the schema format and constraints | No test data specification was provided, so boundary and edge cases were derived from the schema rules |
-| 2 | Tests for `parseSchema` use the actual `schema.txt` for valid cases and temporary files for invalid cases | Using the real schema ensures tests stay in sync. Temp files are needed for invalid cases since we can't put bad data in the real schema |
+| 2 | Unit tests use in-memory `List<String>` inputs (no file I/O). Integration test uses `@TempDir` for file-based end-to-end validation | Unit tests are fast and isolated. The integration test proves the full pipeline (read → parse → generate → write) works with real files |
 | 3 | Generated `FixedLengthParser.java` and `Record.java` are validated by checking the generated source code content | The generated files are not compiled as part of the project, so we verify correctness by asserting against the generated string output |
 | 4 | `@MethodSource` with `Stream<Arguments>` is used instead of `@CsvSource` for parameterized tests | Test inputs contain multi-line strings (`\n`) and spaces that CSV cannot represent cleanly without awkward escaping |
 
@@ -31,8 +31,9 @@ Test for Interview
 | Test File | What it tests | How |
 |-----------|--------------|-----|
 | `SchemaFieldTest` | Single field validation (name, start, end) | Parameterized valid/invalid inputs against the `SchemaField` constructor. Covers: null/empty/blank names, invalid identifiers, negative/zero positions, start > end |
-| `MainTest` | Schema parsing and cross-field validation | Valid schemas: actual `schema.txt`, boundary cases (single char field, large positions, many fields, single-position overlap). Invalid schemas: temp files testing empty file, missing columns, non-integer positions, gaps, deep overlaps, duplicates, leading underscore/hyphen, out-of-order fields |
-| `MainTest` | Overlap constant adjustment | Verifies `ParserGenerator` adjusts the earlier field's end constant when a single-position overlap is detected |
+| `SchemaParserTest` | Schema parsing and cross-field validation | Valid schemas: boundary cases (single char field, large positions, many fields, single-position overlap). Invalid schemas: empty file, missing columns, non-integer positions, gaps, deep overlaps, duplicates, leading underscore/hyphen, out-of-order fields. Uses in-memory data, no file I/O |
+| `SchemaParserTest` | Overlap constant adjustment | Verifies `ParserGenerator` adjusts the earlier field's end constant when a single-position overlap is detected |
+| `MainIntegrationTest` | End-to-end pipeline (file I/O, orchestration) | Writes a temp schema file, runs `Main.main()`, asserts both output files are generated with correct content. Also verifies graceful handling of invalid schemas and missing files |
 | `FixedLengthParserTest` | Generated `FixedLengthParser.java` structure | Verifies constants (count + names), method signatures, imports, field extraction with trim, short line handling. Uses in-memory generation, no file I/O |
 | `RecordTest` | Generated `Record.java` structure | Verifies fields (count + names), constructor (params + assignments), `toString` contains all fields. Uses in-memory generation, no file I/O |
 
