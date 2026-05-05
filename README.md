@@ -6,7 +6,7 @@ Test for Interview
 | # | Assumption | Reason |
 |---|-----------|--------|
 | 1 | Schema positions are 1-based inclusive (e.g., `name 1 20` means positions 1 through 20) | The sample solution uses `substring(start - 1, end)`, confirming 1-based inclusive positions |
-| 2 | Single-position overlap is allowed and resolved by giving the boundary to the later field (e.g., `name 1 20` and `gender 20 21` — `NAME_END` becomes 19). Deep overlaps are rejected | The provided schema intentionally shares position 20. The boundary logically belongs to the later field. Deep overlaps are ambiguous |
+| 2 | Single-position overlap is allowed and resolved by giving the boundary to the later field (e.g., `name 1 20` and `gender 20 21` — `NAME_END` becomes 19). Deep overlaps are rejected | The provided schema intentionally shares position 20. The boundary logically belongs to the later field. |
 | 3 | Lines shorter than the last field's end position are skipped | Matches sample solution. Short lines would cause `IndexOutOfBoundsException` |
 | 4 | All extracted fields are trimmed by default | Matches sample solution which calls `.trim()` on all fields. A per-field flag could be added if selective trimming is needed |
 | 5 | First field must start at position 1 | Otherwise data at the beginning of the line is silently ignored, likely a schema error |
@@ -39,3 +39,6 @@ Test for Interview
 
 ### Known Limitations :
 The generated `FixedLengthParser.java` logic must match the provided sample solution and cannot be modified. As a result, there is no error handling inside the generated parser — no field validation, no data type checking, no logging of skipped lines, and no per-record error reporting. If requirements allowed modifying the parser logic, these would be addressed.
+
+### AI Tools :
+AI tools (Claude) were used to assist with debugging, test case design, code review, and documentation during development.

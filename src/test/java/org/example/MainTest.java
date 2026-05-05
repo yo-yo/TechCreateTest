@@ -72,7 +72,7 @@ class MainTest {
                 Arguments.of("name 1 20\ngender 15 21\n", "overlapping fields"),
                 Arguments.of("name 1 18\ngender 20 21\n", "gap between fields"),
                 Arguments.of("123invalid 1 20\n", "invalid field name"),
-                Arguments.of("first_name 1 10\nfirstName 11 20\n", "duplicate after camelCase conversion"),
+                Arguments.of("first_name 1 10\nfirst-name 11 20\n", "duplicate after camelCase conversion"),
                 Arguments.of("name 1 0\n", "end less than start"),
                 Arguments.of("name 0 10\n", "zero start position")
         );
