@@ -39,8 +39,12 @@ Test for Interview
 
 ### Usage :
 
-```
-java -jar InteriewTest.jar [schema-file-path]
+```bash
+# Build
+mvn clean package
+
+# Run
+java -jar target/InteriewTest-1.0-SNAPSHOT.jar <schema-file-path>
 ```
 
 If no path is provided, defaults to `src/main/java/org/example/schema.txt`.
