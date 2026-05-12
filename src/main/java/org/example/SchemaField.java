@@ -9,10 +9,8 @@ public class SchemaField {
     private int end;
 
     public SchemaField(String schemaVariable, int start, int end) {
-        validateName(schemaVariable);
-        validatePositions(start, end);
-
-        this.schemaVariable = sanitize(schemaVariable.trim());
+        validateRange(start, end);
+        this.schemaVariable = validateString(schemaVariable);
         this.start = start;
         this.end = end;
     }
@@ -49,16 +47,18 @@ public class SchemaField {
         return result;
     }
 
-    private static void validateName(String name) {
+    private static String validateString(String name) {
         if (name == null || name.trim().isEmpty() || name.equals("null")) {
             throw new IllegalArgumentException("schemaVariable cannot be null or empty");
         }
-        if (sanitize(name.trim()).isEmpty()) {
+        String sanitized = sanitize(name);
+        if (sanitized.isEmpty()) {
             throw new IllegalArgumentException("schemaVariable produces no valid Java identifier: " + name);
         }
+        return sanitized;
     }
 
-    private static void validatePositions(int start, int end) {
+    private static void validateRange(int start, int end) {
         if (start < 1 || end < 1) {
             throw new IllegalArgumentException("start and end must be positive");
         }
