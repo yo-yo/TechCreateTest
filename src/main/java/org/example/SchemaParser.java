@@ -22,15 +22,15 @@ public class SchemaParser {
             if (line.isEmpty())
                 continue;
 
-            String[] lineContents = line.split("\\s+");
+            String[] lineContents = line.split("\\|");
             if (lineContents.length < 3) {
-                throw new SchemaParseException("Line " + lineNumber + ": expected 3 columns (name start end), got " + lineContents.length);
+                throw new SchemaParseException("Line " + lineNumber + ": expected 3 columns (name|start|end), got " + lineContents.length);
             }
 
             try {
-                String fieldName = lineContents[0];
-                int start = Integer.parseInt(lineContents[1]);
-                int end = Integer.parseInt(lineContents[2]);
+                String fieldName = lineContents[0].trim();
+                int start = Integer.parseInt(lineContents[1].trim());
+                int end = Integer.parseInt(lineContents[2].trim());
                 schemaFieldsList.add(new SchemaField(fieldName, start, end));
             } catch (NumberFormatException e) {
                 throw new SchemaParseException("Line " + lineNumber + ": start/end must be integers");
