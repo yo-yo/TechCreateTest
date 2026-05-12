@@ -32,12 +32,16 @@ public class SchemaField {
         StringBuilder sb = new StringBuilder();
         for (String part : parts) {
             part = part.replaceAll("[^a-zA-Z0-9_]", "");
-            if (part.isEmpty()) continue;
+            if (part.isEmpty()) {
+                continue;
+            }
             if (sb.length() == 0) {
                 sb.append(part);
             } else {
                 sb.append(Character.toUpperCase(part.charAt(0)));
-                if (part.length() > 1) sb.append(part.substring(1));
+                if (part.length() > 1) {
+                    sb.append(part.substring(1));
+                }
             }
         }
         String result = sb.toString();
