@@ -1,0 +1,53 @@
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+public class FixedLengthParser {
+
+    // Schema configuration
+#foreach($field in $fields)
+    private static final int ${field.upperName}_START = ${field.start};
+    private static final int ${field.upperName}_END = ${field.end};
+#end
+
+    public List<Record> parseFile(String filePath) throws IOException {
+        List<Record> records = new ArrayList<>();
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                if (line.length() < ${lastField}_END) {
+                    // Handle lines that are shorter than expected
+                    continue;
+                }
+
+                // Extract fields based on fixed positions
+#foreach($field in $fields)
+                String ${field.schemaVariable} = extractField(line, ${field.upperName}_START, ${field.upperName}_END).trim();
+#end
+
+                // Create a new Record object
+                Record record = new Record(#foreach($field in $fields)${field.schemaVariable}#if($foreach.hasNext), #end#end);
+                records.add(record);
+            }
+        }
+        return records;
+    }
+
+    private String extractField(String line, int start, int end) {
+        return line.substring(start - 1, end);
+    }
+
+    public static void main(String[] args) {
+        FixedLengthParser parser = new FixedLengthParser();
+        try {
+            List<Record> records = parser.parseFile("path/to/your/file.txt");
+            for (Record record : records) {
+                System.out.println(record);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}

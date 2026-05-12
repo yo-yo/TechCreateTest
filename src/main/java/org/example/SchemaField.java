@@ -38,6 +38,14 @@ public class SchemaField {
         return end;
     }
 
+    public void setEnd(int end) {
+        this.end = end;
+    }
+
+    public String getUpperName() {
+        return schemaVariable.toUpperCase();
+    }
+
     @Override
     public String toString() {
         return "SchemaField{" +
