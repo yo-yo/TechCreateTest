@@ -1,5 +1,7 @@
 package org.example;
 
+import javax.lang.model.SourceVersion;
+
 public class SchemaField {
 
     private String schemaVariable;
@@ -46,6 +48,9 @@ public class SchemaField {
         }
         String result = sb.toString();
         if (!result.isEmpty() && Character.isDigit(result.charAt(0))) {
+            result = "_" + result;
+        }
+        if (SourceVersion.isKeyword(result)) {
             result = "_" + result;
         }
         return result;

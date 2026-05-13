@@ -26,7 +26,8 @@ class SchemaParserTest {
                 Arguments.of("123invalid|1|20", 1, "leading digit sanitized"),
                 Arguments.of("_FIRST_NAME|1|20", 1, "leading underscore"),
                 Arguments.of("-name|1|20", 1, "leading hyphen sanitized"),
-                Arguments.of("remaining balance|1|20", 1, "name with spaces sanitized")
+                Arguments.of("remaining balance|1|20", 1, "name with spaces sanitized"),
+                Arguments.of("class|1|20", 1, "reserved keyword sanitized")
         );
     }
 

@@ -20,7 +20,9 @@ class SchemaFieldTest {
                 Arguments.of("first name", 1, 20, "firstName", "spaces to camelCase"),
                 Arguments.of("first-name", 1, 20, "firstName", "hyphens to camelCase"),
                 Arguments.of("_name", 1, 20, "_name", "leading underscore"),
-                Arguments.of("-name", 1, 20, "name", "leading hyphen stripped")
+                Arguments.of("-name", 1, 20, "name", "leading hyphen stripped"),
+                Arguments.of("class", 1, 20, "_class", "reserved keyword prefixed"),
+                Arguments.of("int", 1, 20, "_int", "primitive type keyword prefixed")
         );
     }
 
