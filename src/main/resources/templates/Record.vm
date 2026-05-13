@@ -1,0 +1,27 @@
+public class Record {
+
+#foreach($field in $fields)
+     private String ${field.schemaVariable};
+#end
+
+     public Record(#foreach($field in $fields)String ${field.schemaVariable}#if($foreach.hasNext), #end#end){
+#foreach($field in $fields)
+         this.${field.schemaVariable}=${field.schemaVariable};
+#end
+     }
+
+     @Override
+     public String toString() {
+         return "Record{" +
+#foreach($field in $fields)
+#if($foreach.hasNext)
+                 "${field.schemaVariable}='" + ${field.schemaVariable} + "', " +
+#else
+                 "${field.schemaVariable}='" + ${field.schemaVariable} + "'" +
+#end
+#end
+                 "}";
+     }
+     // Getters and Setters (if needed)
+
+}

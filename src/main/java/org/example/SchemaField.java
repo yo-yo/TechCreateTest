@@ -38,6 +38,17 @@ public class SchemaField {
         return end;
     }
 
+    // Validation in case setEnd is called outside ParserGenerator
+    public void setEnd(int end) {
+        if (end < 1) {
+            throw new IllegalArgumentException("end must be positive");
+        }
+        if (start > end) {
+            throw new IllegalArgumentException("start (" + start + ") cannot be greater than end (" + end + ")");
+        }
+        this.end = end;
+    }
+
     @Override
     public String toString() {
         return "SchemaField{" +
