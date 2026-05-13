@@ -7,6 +7,8 @@ import java.util.List;
 public class ParserGenerator {
 
     public static String generate(List<SchemaField> schemaFieldsList) {
+        // Adjust field boundaries when end overlaps with next field's start
+        // ex. name(1-20), gender(20-21) → name(1-19), gender(20-21)
         for (int i = 0; i < schemaFieldsList.size(); i++) {
             SchemaField field = schemaFieldsList.get(i);
             if (i + 1 < schemaFieldsList.size() && field.getEnd() >= schemaFieldsList.get(i + 1).getStart()) {
