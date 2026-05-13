@@ -8,8 +8,8 @@ public class FixedLengthParser {
 
     // Schema configuration
 #foreach($field in $fields)
-    private static final int ${field.upperName}_START = ${field.start};
-    private static final int ${field.upperName}_END = ${field.end};
+    private static final int ${field.schemaVariable.toUpperCase()}_START = ${field.start};
+    private static final int ${field.schemaVariable.toUpperCase()}_END = ${field.end};
 #end
 
     public List<Record> parseFile(String filePath) throws IOException {
@@ -17,14 +17,14 @@ public class FixedLengthParser {
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                if (line.length() < ${lastField}_END) {
+                if (line.length() < ${lastField.schemaVariable.toUpperCase()}_END) {
                     // Handle lines that are shorter than expected
                     continue;
                 }
 
                 // Extract fields based on fixed positions
 #foreach($field in $fields)
-                String ${field.schemaVariable} = extractField(line, ${field.upperName}_START, ${field.upperName}_END).trim();
+                String ${field.schemaVariable} = extractField(line, ${field.schemaVariable.toUpperCase()}_START, ${field.schemaVariable.toUpperCase()}_END).trim();
 #end
 
                 // Create a new Record object

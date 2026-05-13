@@ -18,7 +18,7 @@ public class ParserGenerator {
 
         VelocityContext ctx = new VelocityContext();
         ctx.put("fields", schemaFieldsList);
-        ctx.put("lastField", lastField.getUpperName());
+        ctx.put("lastField", lastField);
         return TemplateRenderer.render("templates/FixedLengthParser.vm", ctx);
     }
 }

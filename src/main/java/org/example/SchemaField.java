@@ -39,11 +39,13 @@ public class SchemaField {
     }
 
     public void setEnd(int end) {
+        if (end < 1) {
+            throw new IllegalArgumentException("end must be positive");
+        }
+        if (start > end) {
+            throw new IllegalArgumentException("start (" + start + ") cannot be greater than end (" + end + ")");
+        }
         this.end = end;
-    }
-
-    public String getUpperName() {
-        return schemaVariable.toUpperCase();
     }
 
     @Override
