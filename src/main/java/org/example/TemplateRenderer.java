@@ -10,6 +10,7 @@ public class TemplateRenderer {
 
     private static final VelocityEngine engine;
 
+    // Configure Velocity to load .vm templates from the classpath (src/main/resources)
     static {
         engine = new VelocityEngine();
         engine.setProperty("resource.loaders", "class");
