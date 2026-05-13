@@ -47,6 +47,7 @@ public class SchemaParser {
             throw new SchemaParseException("First field must start at position 1, got " + schemaFieldsList.get(0).getStart());
         }
 
+        // Validate field ordering: no duplicates, sequential positions, no overlaps or gaps
         for (int i = 0; i < schemaFieldsList.size(); i++) {
             SchemaField current = schemaFieldsList.get(i);
 
