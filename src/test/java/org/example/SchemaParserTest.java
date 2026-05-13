@@ -19,10 +19,15 @@ class SchemaParserTest {
 
     static Stream<Arguments> validSchemas() {
         return Stream.of(
-                Arguments.of("flag 1 1", 1, "single char field"),
-                Arguments.of("name 1 500\ndata 501 1000", 2, "large positions"),
-                Arguments.of("a 1 5\nb 6 10\nc 11 15\nd 16 20\ne 21 25", 5, "many fields"),
-                Arguments.of("name 1 20\ngender 20 21\nage 22 25", 3, "single position overlap")
+                Arguments.of("flag|1|1", 1, "single char field"),
+                Arguments.of("name|1|500\ndata|501|1000", 2, "large positions"),
+                Arguments.of("a|1|5\nb|6|10\nc|11|15\nd|16|20\ne|21|25", 5, "many fields"),
+                Arguments.of("name|1|20\ngender|20|21\nage|22|25", 3, "single position overlap"),
+                Arguments.of("123invalid|1|20", 1, "leading digit sanitized"),
+                Arguments.of("_FIRST_NAME|1|20", 1, "leading underscore"),
+                Arguments.of("-name|1|20", 1, "leading hyphen sanitized"),
+                Arguments.of("remaining balance|1|20", 1, "name with spaces sanitized"),
+                Arguments.of("class|1|20", 1, "reserved keyword sanitized")
         );
     }
 
@@ -36,18 +41,16 @@ class SchemaParserTest {
     static Stream<Arguments> invalidSchemas() {
         return Stream.of(
                 Arguments.of("", "empty file"),
-                Arguments.of("name 1", "missing columns"),
-                Arguments.of("name abc def", "non-integer positions"),
-                Arguments.of("name 2 20", "first field not starting at 1"),
-                Arguments.of("name 1 10\nname 11 20", "duplicate field names"),
-                Arguments.of("fieldA 1 10\nfieldB 1 5", "fields not in order"),
-                Arguments.of("name 1 20\ngender 15 21", "overlapping fields"),
-                Arguments.of("name 1 18\ngender 20 21", "gap between fields"),
-                Arguments.of("123invalid 1 20", "invalid field name"),
-                Arguments.of("name 1 0", "end less than start"),
-                Arguments.of("name 0 10", "zero start position"),
-                Arguments.of("_FIRST_NAME 1 20", "leading underscore in field name"),
-                Arguments.of("-name 1 20", "leading hyphen in field name")
+                Arguments.of("name|1", "missing columns"),
+                Arguments.of("name|abc|def", "non-integer positions"),
+                Arguments.of("name|2|20", "first field not starting at 1"),
+                Arguments.of("name|1|10\nname|11|20", "duplicate field names"),
+                Arguments.of("fieldA|1|10\nfieldB|1|5", "fields not in order"),
+                Arguments.of("name|1|20\ngender|15|21", "overlapping fields"),
+                Arguments.of("name|1|18\ngender|20|21", "gap between fields"),
+                Arguments.of("name|1|0", "end less than start"),
+                Arguments.of("name|0|10", "zero start position"),
+                Arguments.of("@#$%|1|20", "no valid chars after sanitize")
         );
     }
 

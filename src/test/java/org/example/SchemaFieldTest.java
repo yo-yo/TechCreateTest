@@ -12,18 +12,25 @@ class SchemaFieldTest {
 
     static Stream<Arguments> validInputs() {
         return Stream.of(
-                Arguments.of("name", 1, 20, "simple name"),
-                Arguments.of("flag", 5, 5, "single position"),
-                Arguments.of("first_name", 1, 20, "underscore name"),
-                Arguments.of("field1", 1, 10, "alphanumeric name")
+                Arguments.of("name", 1, 20, "name", "simple name"),
+                Arguments.of("flag", 5, 5, "flag", "single position"),
+                Arguments.of("first_name", 1, 20, "first_name", "underscore name"),
+                Arguments.of("field1", 1, 10, "field1", "alphanumeric name"),
+                Arguments.of("123abc", 1, 20, "_123abc", "leading digit prefixed"),
+                Arguments.of("first name", 1, 20, "firstName", "spaces to camelCase"),
+                Arguments.of("first-name", 1, 20, "firstName", "hyphens to camelCase"),
+                Arguments.of("_name", 1, 20, "_name", "leading underscore"),
+                Arguments.of("-name", 1, 20, "name", "leading hyphen stripped"),
+                Arguments.of("class", 1, 20, "_class", "reserved keyword prefixed"),
+                Arguments.of("int", 1, 20, "_int", "primitive type keyword prefixed")
         );
     }
 
-    @ParameterizedTest(name = "accepts {3}")
+    @ParameterizedTest(name = "accepts {4}")
     @MethodSource("validInputs")
-    void validInputs_setsAllFieldsCorrectly(String name, int start, int end, String reason) {
+    void validInputs_setsAllFieldsCorrectly(String name, int start, int end, String expectedVar, String reason) {
         SchemaField field = new SchemaField(name, start, end);
-        assertEquals(name, field.getSchemaVariable());
+        assertEquals(expectedVar, field.getSchemaVariable());
         assertEquals(start, field.getStart());
         assertEquals(end, field.getEnd());
     }
@@ -33,15 +40,12 @@ class SchemaFieldTest {
                 Arguments.of(null, 1, 20, "null name"),
                 Arguments.of("", 1, 20, "empty name"),
                 Arguments.of("   ", 1, 20, "blank name"),
-                Arguments.of("123abc", 1, 20, "invalid Java identifier"),
                 Arguments.of("name", -1, 20, "negative start"),
                 Arguments.of("name", 0, 20, "zero start"),
                 Arguments.of("name", 25, 20, "start greater than end"),
                 Arguments.of("null", 1, 20, "string null as name"),
-                Arguments.of("first name", 1, 20, "name with spaces"),
-                Arguments.of("first-name", 1, 20, "name with hyphens"),
                 Arguments.of("name", -1, -5, "both start and end negative"),
-                Arguments.of("_name", 1, 20, "leading underscore")
+                Arguments.of("@#$%", 1, 20, "no valid chars after sanitize")
         );
     }
 

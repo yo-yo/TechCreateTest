@@ -1,3 +1,5 @@
-name 1 20
-gender 20 21
-age 22 25
+name|1|20
+gender|20|21
+age|22|25
+address line|26|29
+remaining balance|30|31

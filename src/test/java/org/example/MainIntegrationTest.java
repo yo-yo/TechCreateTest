@@ -18,7 +18,7 @@ class MainIntegrationTest {
     @Test
     void main_validSchema_generatesBothFiles() throws IOException {
         Path schema = tempDir.resolve("schema.txt");
-        Files.writeString(schema, "firstName 1 20\nlastName 21 40\nage 41 43");
+        Files.writeString(schema, "firstName|1|20\nlastName|21|40\nage|41|43");
 
         Main.main(new String[]{schema.toString()});
 
@@ -42,7 +42,7 @@ class MainIntegrationTest {
     @Test
     void main_invalidSchema_doesNotGenerateFiles() throws IOException {
         Path schema = tempDir.resolve("schema.txt");
-        Files.writeString(schema, "name 5 20");
+        Files.writeString(schema, "name|5|20");
 
         Main.main(new String[]{schema.toString()});
 
